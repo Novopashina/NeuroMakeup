@@ -1,0 +1,113 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/home.css'%}" type="text/css">
+{% endblock %}
+
+{% block title %}Главная{% endblock %}
+
+{% block content %}
+    
+    <div class="content">
+        <div class="conteiner">
+            <form method="post" enctype="multipart/form-data" action="{% url 'result' %}">
+                {% csrf_token %}
+                <div class="container">
+                    <div class="image_container">
+                        <div class="image_background">
+                            <img id="img_preview1" src="" alt="target">
+                        </div>
+                        <label class="file_label">
+                            <input type="file" name="img_obj1" class="file_input">
+                            <span>Выбрать файл</span>
+                        </label>
+                    </div>
+                    <div class="image_container">
+                        <div class="image_background">
+                            <img id="img_preview2" src="" alt="reference">
+                        </div>
+                        <label class="file_label">
+                            <input type="file" name="img_obj2" class="file_input">
+                            <span>Выбрать файл</span>
+                        </label>
+                    </div>                    
+                    <div class="image_container">
+                        <div class="image_background" id="result_image">
+                            <img src="{{ image_path }}" alt="result">
+                        </div>
+                        <button id="apply_button"type="submit">Применить</button>
+                        <button id="save_button" style="display: none;">Сохранить</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        
+    
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+        $(document).ready(function() {
+            $('input[name=img_obj1]').change(function(e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#img_preview1').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            $('input[name=img_obj2]').change(function(e) {
+                var file = e.target.files[0];
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#img_preview2').attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+        </script>
+        <script>
+            $(document).ready(function() {
+                $('form').submit(function(event) {
+                    event.preventDefault();
+    
+                    var formData = new FormData($(this)[0]);
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: $(this).attr('action'),
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function(response) {
+                            var randomString = Math.random().toString(36).substring(7);
+                            $('#result_image img').attr('src', response.image_path + '?' + randomString);
+                            $('#save_button').show();
+                        },
+                        error: function(xhr, errmsg, err) {
+                            console.log(xhr.status + ': ' + xhr.responseText);
+                        }
+                    });
+                });
+            });
+        </script>
+        <script>
+            $('#save_button').click(function() {
+                var resultImageUrl = $('#result_image img').attr('src');
+
+                var randomString = Math.random().toString(36).substring(7);
+
+                var downloadLink = document.createElement('a');
+                downloadLink.href = resultImageUrl + '?' + randomString;
+                downloadLink.download = 'processed_image.jpeg';  
+
+                downloadLink.click();
+            });
+        </script>
+
+    </div>
+{% endblock %}
+
+
+
