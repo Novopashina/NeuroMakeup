@@ -32,7 +32,7 @@ def apply_transformation(request):
     if request.method == 'POST':
         img_obj1 = request.FILES['img_obj1']
         img_obj2 = request.FILES['img_obj2']
-        serv_url = 'http://localhost:8080/process_images'  
+        serv_url = 'http://localhost:8080/process_images'  # здесь localhost заменить на доменное имя ?сервера с нейросетью?
         files = {'image1': img_obj1, 'image2': img_obj2}
         response = requests.post(serv_url, files=files)
 

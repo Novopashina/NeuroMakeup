@@ -9,5 +9,3 @@ ENV PATH /opt/conda/envs/py36_env/bin:$PATH
 
 WORKDIR /DMT
 COPY . /DMT
-
-# Остальные инструкции Dockerfile для вашей нейросети
