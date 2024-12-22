@@ -1,0 +1,27 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:;base64,=">
+    <link rel="stylesheet" href="{% static 'css/layout.css'%}" type="text/css">
+    <link type="image/svg+xml" href="{% static 'img/wand-sparkles-solid_1.svg' %}" rel="shortcut icon">
+    <link type="image/svg+xml" href="{% static 'img/wand-sparkles-solid_1.svg' %}" rel="icon">
+    {% block style %}{% endblock %}
+    <title>{% block title %}{% endblock %}</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>Disentangled Makeup Transfer</h1>
+        <p>Платформа для переноса макияжа по требованию с помощью генеративно-состязательной сети</p>
+    </div>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>
+
+
+
+

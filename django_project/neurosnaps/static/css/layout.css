@@ -1,0 +1,44 @@
+* {
+    margin: 0; 
+}
+
+html, body {
+    height: 100%; 
+    margin: 0; 
+    padding: 0; 
+}
+
+body {
+    background-image: url('https://media.24h.tv/img/0d/80/0d804705e2c98ca51a419980e0e33e4e.jpeg?format=webp?w=1080'); 
+    background-size: cover; 
+    background-position: center; 
+    background-attachment: fixed;
+    margin: 0; 
+    padding: 0; 
+    position: relative; 
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px; 
+    padding-top: 60px;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+}
+
+body::before {
+    content: ""; 
+    position: absolute; 
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: -1; 
+}
+
+
+
+
+
+

@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/feedback.css'%}" type="text/css">
+{% endblock %}
+
+{% block title %}Обратная связь{% endblock %}
+
+{% block content %}
+    <body>
+        <div class="message-container">
+            {% if message_sent %}
+            <p class="success-message">Сообщение успешно отправлено. 
+                Мы ответим на него в кратчайшие сроки</p>
+            {% endif %}
+        </div>
+        <div class="feedback">
+            <div class="text">
+                <h2>Обратная связь<h2>
+                <p>Заполните форму, если Вы хотите отправить сообщение</p>
+            </div>
+            <form method="post" action="{% url 'link_feedback' %}">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    </body>
+    {% endblock %}
+    
+    
