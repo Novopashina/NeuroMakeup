@@ -11,7 +11,7 @@ def get_image_path(instance, filename):
     return os.path.join('img', filename)
 
 class MyImage(models.Model):
-    title = models.CharField(max_length=255, blank=True, verbose_name='Название')
+    title = models.CharField(max_length=255, blank=True, verbose_name='Назание')
     image = models.ImageField(upload_to=get_image_path, verbose_name='Изображение')
 
     def __str__(self):
