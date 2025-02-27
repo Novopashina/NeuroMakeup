@@ -77,25 +77,25 @@ WSGI_APPLICATION = 'neurosnaps.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db1.sqlite3',
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'neurodjango',
-        'USER': 'neurodjango_admin',
-        'PASSWORD': 'neurodjango123',
-        'HOST': '127.0.0.1',
-        'OPTIONS': {
-            'client_encoding': 'UTF8',
-        }
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db1.sqlite3',
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'neurodjango',
+#         'USER': 'neurodjango_admin',
+#         'PASSWORD': 'neurodjango123',
+#         'HOST': '127.0.0.1',
+#         'OPTIONS': {
+#             'client_encoding': 'UTF8',
+#         }
+#     }
+# }
 
 
 
