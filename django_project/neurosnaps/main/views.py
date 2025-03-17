@@ -10,7 +10,7 @@ import requests
 from django.core.files.base import ContentFile
 
 
-def image_upload_view(request):
+def image_upload_views(request):
     img_obj1 = None
     img_obj2 = None
 
@@ -48,6 +48,22 @@ def apply_transformation(request):
             return render(request, 'home.html')
     else:
         return render(request, 'home.html')
+    
+def image_upload(request):
+    img_obj1 = None
+
+    if request.method == 'POST':
+        form1 = ImageForm(request.POST, request.FILES, prefix='form1')
+        
+        if form1.is_valid():
+            img_obj1 = form1.save()
+
+    else:
+        form1 = ImageForm(prefix='form1')
+
+    return render(request, 'recogn.html', {'form1': form1, 'img_obj1': img_obj1})
+
+# def detect_emotion(request):
 
 
 def feedback_view(request):

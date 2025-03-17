@@ -1,6 +1,3 @@
-* {
-    margin: 0; 
-}
 
 .header {
     text-align: center;
@@ -32,13 +29,7 @@ body::before {
     color: #c9c7c7; 
 }
 
-form{
-    display: inline;
-}
 
-
-
-/* Курсач тут снизу*/
 .container {
     background-color: rgb(43, 41, 46);
     display: flex;
