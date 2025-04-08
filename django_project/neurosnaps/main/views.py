@@ -6,7 +6,6 @@ from .forms import ImageForm
 from .forms import FeedbackForm
 import requests
 from django.shortcuts import render
-import requests
 from django.core.files.base import ContentFile
 
 
@@ -30,7 +29,7 @@ def image_upload_views(request):
 
 def apply_transformation(request):
     if request.method == 'POST':
-        img_obj1 = request.FILES['img_obj1']
+        img_obj1 = request.FILES['img_obj1'] # получаем 2 изображения для отправки
         img_obj2 = request.FILES['img_obj2']
         serv_url = 'http://localhost:8080/process_images'  # здесь localhost заменить на доменное имя ?сервера с нейросетью?
         files = {'image1': img_obj1, 'image2': img_obj2}
@@ -63,7 +62,70 @@ def image_upload(request):
 
     return render(request, 'recogn.html', {'form1': form1, 'img_obj1': img_obj1})
 
+
+def detect_emotion(request):
+    if request.method == 'POST' and request.FILES.get('img_obj1'):
+        url = "http://127.0.0.1:8081"  # Адрес сервера эмоций
+        files = {'image': request.FILES['img_obj1']}  # Отправляем файл
+
+        try:
+            response = requests.post(url, files=files)
+            # print("Status code:", response.status_code)
+            # print("Response content:", response.content)
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                except ValueError:
+                    return JsonResponse({'error': 'Ответ сервера не в JSON-формате'}, status=500)
+
+                user_emotion = data.get('user_emotion', 'Не определено')
+                matching_image = data.get('matching_image', '')
+
+                return JsonResponse({
+                    'user_emotion': user_emotion,
+                    'matching_image': f"/static/img/{matching_image}" if matching_image else ""
+                })
+            else:
+                return JsonResponse({'error': 'Ошибка обработки на сервере'}, status=500)
+
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': f'Ошибка соединения: {str(e)}'}, status=500)
+    return JsonResponse({'error': 'Неверный запрос'}, status=400)
+
+
 # def detect_emotion(request):
+#     user_emotion = None
+#     matching_image = None
+#     img_obj = None
+
+#     if request.method == 'POST':
+#         form = ImageForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             img_obj = form.save()
+#             img_path = img_obj.image.path
+
+#             with open(img_path, 'rb') as img_file:
+#                 image_data = img_file.read()
+
+#             serv_url = 'http://localhost:8080'  # URL сервера
+#             # response = requests.post(serv_url, json={'image': image_data.decode('latin1')})
+#             response = requests.post(serv_url, files={'image': image_data})
+
+
+#             if response.status_code == 200:
+#                 data = response.json()
+#                 user_emotion = data.get('user_emotion', 'Неизвестно')
+#                 matching_image = data.get('matching_image', None)
+            
+#     else:
+#         form = ImageForm()
+
+#     return render(request, 'recogn.html', {
+#         'form': form,
+#         'img_obj': img_obj,
+#         'user_emotion': user_emotion,
+#         'matching_image': matching_image
+#     })
 
 
 def feedback_view(request):

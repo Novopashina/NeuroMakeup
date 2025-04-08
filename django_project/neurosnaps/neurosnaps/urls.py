@@ -25,10 +25,10 @@ app_name = 'main'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls'), name='home'),
-    # path('feedback/', views.feedback_view, name='link_feedback'),
     path('apply_transformation/', views.apply_transformation, name='result'),
     path('recognize/', views.image_upload, name='recognize'), # стр с загрузкой одного фото
     path('detect_emotion/', views.detect_emotion, name='detect'),
+    # path('feedback/', views.feedback_view, name='link_feedback')
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
