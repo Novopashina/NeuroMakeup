@@ -31,7 +31,8 @@ def apply_transformation(request):
     if request.method == 'POST':
         img_obj1 = request.FILES['img_obj1'] # получаем 2 изображения для отправки
         img_obj2 = request.FILES['img_obj2']
-        serv_url = 'http://localhost:8080/process_images'  # здесь localhost заменить на доменное имя ?сервера с нейросетью?
+        # serv_url = 'http://localhost:8080/process_images'
+        serv_url = 'http://makeapp-server-anaesthesia.amvera.io/process_images'  # здесь localhost заменить на доменное имя ?сервера с нейросетью?
         files = {'image1': img_obj1, 'image2': img_obj2}
         response = requests.post(serv_url, files=files)
 
@@ -65,7 +66,9 @@ def image_upload(request):
 
 def detect_emotion(request):
     if request.method == 'POST' and request.FILES.get('img_obj1'):
-        url = "http://127.0.0.1:8081"  # Адрес сервера эмоций
+        # url = "http://127.0.0.1:8081"  
+        
+        url = "http://emotapp-server-anaesthesia.amvera.io"
         files = {'image': request.FILES['img_obj1']}  # Отправляем файл
 
         try:

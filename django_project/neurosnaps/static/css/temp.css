@@ -1,0 +1,327 @@
+* {
+    margin: 0; 
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 40px; 
+    padding-top: 60px;
+    font-family: Arial, Helvetica, sans-serif;
+    position: relative;
+}
+
+body::before {
+    content: ""; 
+    position: absolute; 
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: -1; 
+    
+}
+
+.header h1 {
+    font-size: 35px; 
+    color: white; 
+    margin-bottom: 10px; 
+}
+
+.header p {
+    font-size: 19px; 
+    color: #c9c7c7; 
+}
+
+form{
+    display: inline;
+}
+
+.general-container{
+    margin-left: auto;  
+    margin-right: auto;
+    max-width: 60%;
+    border: 1px solid #777;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    /* margin-bottom: 60px; */
+    /* padding-bottom: 60px; */
+}
+
+/* .new-container {
+    margin-left: auto;  
+    margin-right: auto;
+    max-width: 60%; 
+} */
+
+.gallery {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+    gap: 20px;
+    background-color: rgb(43, 41, 46);
+    box-shadow:
+        inset 0 -3em 3em rgba(129, 17, 39, 0.1),
+        0.3em 0.3em 1em rgba(55, 26, 34, 0.3),
+        /* 0 50px 20px rgba(0, 0, 0, 0.4); */
+    /* box-shadow: 0 45px 8px -4px rgba(0, 0, 0, 0.8); */
+    /* margin-top: 60px; */
+    /* margin-left: 200px;
+    margin-right: 200px; */
+}
+
+.photo-slot img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+
+
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: #252525;
+    color: #f0f0f0;
+    font-family: 'Segoe UI', sans-serif;
+    padding: 40px;
+    box-shadow:
+        inset 0 -3em 3em rgba(17, 92, 129, 0.1),
+        0.3em 0.3em 1em rgba(26, 44, 55, 0.3);
+    /* margin-left: 200px;
+    margin-right: 200px; */
+}
+
+.hero h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
+}
+
+.hero-button {
+    display: inline-block;
+    font-size: 20px;
+    padding: 12px 32px;
+    /* background: linear-gradient(135deg, #215188, #04233e); */
+    background-color: rgb(254, 191, 114);
+    color: #260d72;
+    text-shadow:
+        1px 1px 1px #8bddc3,
+        2px 2px 1px #836e1b;
+    border-radius: 25px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: background-color 2s 500ms;
+  }
+  
+  .hero-button:hover {
+    background-color: #ff9cce;
+    /* transform: scale(1.03);
+    background: linear-gradient(135deg, #e0e0e0, #555); */
+  }
+  
+/* .hero button {
+    font-size: 20px;
+    padding: 12px 32px;
+    background-color: rgb(254, 191, 114);;
+    color: #2a1919;
+    text-shadow:
+        1px 1px 1px #8bddc3,
+        2px 2px 1px #836e1b;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transition: background-color 2s 500ms;
+}
+  
+.hero button:hover {
+    background-color: #ff9cce;
+} */
+
+/* Курсач тут снизу*/
+.container {
+    background-color: rgb(43, 41, 46);
+    display: flex;
+    /* justify-content: space-around; */
+    justify-content: center;
+    padding: 0px 20px;
+    gap: 40px;
+    /* margin-top: 20px; */
+    /* margin-left: auto;  
+    margin-right: auto; 
+    padding: 0 20px;
+    max-width: 60%;  */
+    box-shadow: 0 -6px 8px -4px rgba(0, 0, 0, 0.8);
+    /* margin-bottom: 60px; */
+}
+
+.image_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 120px; 
+    margin-top: 70px;
+}
+
+.image_background {
+    width: 200px;
+    height: 200px;
+    background-color: rgb(43, 41, 46);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    border: 2px dashed #777;
+    border-radius: 10px;
+    /* box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4); */
+    overflow: hidden;
+}
+
+.image_background img {
+    max-width: 100%;
+    max-height: 100%;
+    display: block;
+}
+
+/* Псевдоэлемент с иконкой */
+.image_background::before {
+    content: "";
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-image: url('../img/placeholder-icon2.svg'); 
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+/* Скрыть иконку, если изображение загружено */
+.image_background:has(img[src]:not([src=""]))::before {
+    opacity: 0;
+}
+
+.image_background:hover {
+    background-color: rgb(45, 45, 59);
+}
+
+/* img {
+    max-width: 100%;
+    max-height: 100%;
+    color: rgb(112, 111, 111); 
+    font-family: Arial, Helvetica, sans-serif;
+} */
+
+
+
+/* Кнопки "выбрать файл" и название */
+.file_input {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    position: absolute;
+    z-index: -1;
+}
+
+.file_label span {
+    position: relative; 
+}
+
+.file_label {
+    display: inline-block;
+    background-color: rgb(54, 51, 58);
+    padding: 7px 30px;
+    border-radius: 5px;
+    font-size: 15px;
+    cursor: pointer;
+    color: white;
+    position: relative;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.file_label:hover {
+    color: rgb(226, 226, 226);
+}
+
+/* #apply_button{
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    background-color: rgb(33, 31, 35);
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+}
+#apply_button:hover{
+    background-color: rgb(26, 25, 25);
+}
+
+#save_button{
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    background-color: black;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+#save_button:hover{
+    background-color: rgb(26, 25, 25);
+} */
+
+#apply_button, #save_button {
+    align-items: center;
+    background-color: #0A66C2;
+    border: 0;
+    border-radius: 100px;
+    box-sizing: border-box;
+    color: #ffffff;
+    cursor: pointer;
+    display: inline-flex;
+    font-family: -apple-system, system-ui, system-ui, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    justify-content: center;
+    line-height: 20px;
+    max-width: 480px;
+    min-height: 40px;
+    min-width: 0px;
+    overflow: hidden;
+    padding: 0px;
+    padding-left: 20px;
+    padding-right: 20px;
+    text-align: center;
+    touch-action: manipulation;
+    transition: background-color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, box-shadow 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s;
+    user-select: none;
+    -webkit-user-select: none;
+    vertical-align: middle;
+}
+
+#apply_button:hover,#apply_button:focus,
+#save_button:hover, #save_button:hover { 
+    background-color: #16437E;
+    color: #ffffff;
+}
+
+#apply_button:active, #save_button:active {
+    background: #09223b;
+    color: rgb(255, 255, 255, .7);
+}
+
+#apply_button:disabled, #save_button:disabled { 
+    cursor: not-allowed;
+    background: rgba(0, 0, 0, .08);
+    color: rgba(0, 0, 0, .3);
+}
+
+#save_button{
+    margin-top: 5px;
+}

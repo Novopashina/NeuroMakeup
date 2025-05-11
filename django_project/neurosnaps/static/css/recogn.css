@@ -6,6 +6,10 @@
     position: relative;
 }
 
+body{
+    background-image: url('../img/bg3.png'); 
+}
+
 body::before {
     content: ""; 
     position: absolute; 
@@ -32,13 +36,19 @@ body::before {
 .container {
     background-color: rgb(43, 41, 46);
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 40px;
     margin-top: 20px;
     margin-left: auto;  
     margin-right: auto; 
     padding: 0 20px;
-    max-width: 70%; 
+    max-width: 60%; 
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
+    border: 1px solid #777;
+}
+
+.container h1{
+    display: inline;
 }
 
 .image_container {
@@ -46,24 +56,69 @@ body::before {
     flex-direction: column;
     align-items: center;
     margin-bottom: 120px; 
-    margin-top: 70px;
+    margin-top: 90px;
+}
+
+.image_container1 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 120px; 
+    margin-top: 62px;
+}
+
+
+.emotion_text {
+    padding-bottom: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .image_background {
     width: 200px;
     height: 200px;
-    background-color: rgb(62, 62, 65);
+    background-color: rgb(43, 41, 46);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 10px;
+    border: 2px dashed #777;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
-img {
+.image_container p{
+    padding-top: 5px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.image_background img {
     max-width: 100%;
     max-height: 100%;
-    color: rgb(112, 111, 111); 
-    font-family: Arial, Helvetica, sans-serif;
+    display: block;
+}
+
+.image_background::before {
+    content: "";
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background-image: url('../img/placeholder-icon2.svg'); 
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+/* Скрыть иконку, если изображение загружено */
+.image_background:has(img[src]:not([src=""]))::before {
+    opacity: 0;
+}
+
+.image_background:hover {
+    background-color: rgb(45, 45, 59);
 }
 
 
@@ -83,22 +138,103 @@ img {
 
 .file_label {
     display: inline-block;
-    background-color: rgb(43, 41, 46);
-    padding: 10px 20px;
+    padding: 7px 30px;
+    margin-bottom: 10px;
     border-radius: 5px;
-    font-size: 16px;
     cursor: pointer;
     color: white;
-    font-size: 16px;
+    font-size: 15px;
     position: relative;
     font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(54, 51, 58);
 }
 
 .file_label:hover {
     color: rgb(226, 226, 226);
 }
 
-#apply_button{
+/* Кнопка "Применить макияж" */
+#apply_button, #apply_makeup, #save_button{
+    /* font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    background-color: black;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer; */
+
+    align-items: center;
+    background-color: #0A66C2;
+    border: 0;
+        border-radius: 100px;
+        box-sizing: border-box;
+        color: #ffffff;
+        cursor: pointer;
+        display: inline-flex;
+        font-family: -apple-system, system-ui, system-ui, "Segoe UI", Roboto, "Helvetica Neue", "Fira Sans", Ubuntu, Oxygen, "Oxygen Sans", Cantarell, "Droid Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Lucida Grande", Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        justify-content: center;
+        line-height: 20px;
+        max-width: 480px;
+        min-height: 40px;
+        min-width: 0px;
+        overflow: hidden;
+        padding: 0px;
+        padding-left: 20px;
+        padding-right: 20px;
+        text-align: center;
+        touch-action: manipulation;
+        transition: background-color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, box-shadow 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s, color 0.167s cubic-bezier(0.4, 0, 0.2, 1) 0s;
+        user-select: none;
+        -webkit-user-select: none;
+        vertical-align: middle;
+}
+
+#save_button{
+    margin-top: 5px;
+}
+
+#apply_button:hover, #apply_button:focus, #apply_makeup:hover, 
+#save_button:hover, #apply_makeup:focus, #save_button:focus{
+    background-color: #16437E;
+    color: #ffffff;
+}
+
+#apply_button:active, #apply_makeup:active, #save_button:active {
+  background: #09223b;
+  color: rgb(255, 255, 255, .7);
+}
+
+#apply_button:disabled, #apply_makeup:disabled,
+#save_button:disabled { 
+  cursor: not-allowed;
+  background: rgba(0, 0, 0, .08);
+  color: rgba(0, 0, 0, .3);
+}
+
+
+/* #save_button{
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    background-color: black;
+    font-size: 16px;
+    border-radius: 5px;
+    padding: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+#save_button:hover{
+    background-color: rgb(26, 25, 25);
+} */
+
+
+/* Кнопка "Определить эмоцию" */
+/* #apply_makeup{
     font-family: Arial, Helvetica, sans-serif;
     color: white;
     background-color: black;
@@ -109,7 +245,7 @@ img {
     padding-right: 10px;
     cursor: pointer;
 }
-#apply_button:hover{
+#apply_makeup:hover{
     background-color: rgb(26, 25, 25);
 }
 
@@ -127,4 +263,4 @@ img {
 }
 #save_button:hover{
     background-color: rgb(26, 25, 25);
-}
+} */

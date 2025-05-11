@@ -9,7 +9,7 @@ html, body {
 }
 
 body {
-    background-image: url('https://media.24h.tv/img/0d/80/0d804705e2c98ca51a419980e0e33e4e.jpeg?format=webp?w=1080'); 
+    background-image: url('../img/bg2.png'); 
     background-size: cover; 
     background-position: center; 
     background-attachment: fixed;
