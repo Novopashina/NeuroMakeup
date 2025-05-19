@@ -105,6 +105,7 @@
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     $('#img_preview1').attr('src', e.target.result);
+                    $('#img_preview1').closest('.image_background').addClass('no-border');
                 };
                 reader.readAsDataURL(file);
             });
@@ -114,6 +115,7 @@
                 var reader = new FileReader();
                 reader.onload = function(e) {
                     $('#img_preview2').attr('src', e.target.result);
+                    $('#img_preview2').closest('.image_background').addClass('no-border');
                 };
                 reader.readAsDataURL(file);
             });
@@ -135,6 +137,7 @@
                         success: function(response) {
                             var randomString = Math.random().toString(36).substring(7);
                             $('#result_image img').attr('src', response.image_path + '?' + randomString);
+                            $('#result_image img').closest('.image_background').addClass('no-border');
                             $('#save_button').show();
                         },
                         error: function(xhr, errmsg, err) {
@@ -160,6 +163,3 @@
 
     </div>
 {% endblock %}
-
-
-

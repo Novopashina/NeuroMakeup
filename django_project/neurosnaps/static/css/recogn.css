@@ -87,6 +87,10 @@ body::before {
     overflow: hidden;
 }
 
+.image_background.no-border {
+    border: none;
+}
+
 .image_container p{
     padding-top: 5px;
     color: white;

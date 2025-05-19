@@ -178,6 +178,10 @@ form{
     overflow: hidden;
 }
 
+.image_background.no-border {
+    border: none;
+}
+
 .image_background img {
     max-width: 100%;
     max-height: 100%;

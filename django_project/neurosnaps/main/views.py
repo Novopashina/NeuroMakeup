@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.core.files.base import ContentFile
 
 
-def image_upload_views(request):
+def images_upload_view(request):
     img_obj1 = None
     img_obj2 = None
 
@@ -94,6 +94,7 @@ def detect_emotion(request):
         except requests.exceptions.RequestException as e:
             return JsonResponse({'error': f'Ошибка соединения: {str(e)}'}, status=500)
     return JsonResponse({'error': 'Неверный запрос'}, status=400)
+
 
 
 # def detect_emotion(request):

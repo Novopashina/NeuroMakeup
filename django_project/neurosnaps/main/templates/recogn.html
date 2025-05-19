@@ -76,6 +76,7 @@
             var reader = new FileReader();
             reader.onload = function(e) {
                 $('#img_preview1').attr('src', e.target.result);
+                $('#img_preview1').closest('.image_background').addClass('no-border');
             };
             reader.readAsDataURL(file);
         });
@@ -101,6 +102,7 @@
         
                     if (response.matching_image) {
                         $('#img_preview2').attr('src', response.matching_image);
+                        $('#img_preview2').closest('.image_background').addClass('no-border');
                     }
                 },
                 error: function(xhr, errmsg, err) {
@@ -139,6 +141,7 @@
                             success: function (response) {
                                 const randomString = Math.random().toString(36).substring(7);
                                 $('#result_image img').attr('src', response.image_path + '?' + randomString);
+                                $('#result_image img').closest('.image_background').addClass('no-border');
                                 $('#save_button').show();
                             },
                             error: function (xhr, errmsg, err) {
