@@ -25,7 +25,7 @@
                         <p>Эмоция: Не определено</p>
                     {% endif %}
                 </h1> -->
-                <div class="image_container1">
+                <div class="image_container1" id="processed_container">
                     <div class="emotion_text" id="emotion_text">
                         {% if user_emotion %}
                             <p>Эмоция: {{ user_emotion }}</p>
@@ -70,15 +70,33 @@
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    $(document).ready(function() {
-        $('input[name=img_obj1]').change(function(e) {
-            var file = e.target.files[0];
-            var reader = new FileReader();
-            reader.onload = function(e) {
-                $('#img_preview1').attr('src', e.target.result);
-                $('#img_preview1').closest('.image_background').addClass('no-border');
-            };
-            reader.readAsDataURL(file);
+    $(document).ready(function () {
+        $('input[name=img_obj1]').change(function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            let formData = new FormData();
+            formData.append('img_obj1', file);
+
+            $.ajax({
+                url: '{% url "recognize" %}',  // image_upload view
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    if (data.processed_image_url) {
+                        $('#img_preview1').attr('src', data.processed_image_url + '?' + Math.random());
+                        $('#img_preview1').show();
+                        $('#img_preview1').closest('.image_background').addClass('no-border');
+
+                    }
+                },
+                error: function (xhr, errmsg, err) {
+                    console.error("Ошибка загрузки: ", xhr.responseText);
+                    alert("Ошибка обработки изображения");
+                }
+            });
         });
     });
     </script>

@@ -7,7 +7,36 @@ from .forms import FeedbackForm
 import requests
 from django.shortcuts import render
 from django.core.files.base import ContentFile
+from PIL import Image
+import numpy as np
+import cv2
+import requests
+from io import BytesIO
+from django.utils.crypto import get_random_string
 
+
+def images_upload_ajax(request):
+    if request.method == 'POST':
+        try:
+            processed_image1 = None
+            processed_image2 = None
+
+            if request.FILES.get('img_obj1'):
+                processed_content1 = process_image_opencv(request.FILES['img_obj1'])
+                processed_image1 = ProcessedImage()
+                processed_image1.image.save(f'processed1_{get_random_string(8)}.jpg', processed_content1)
+
+            if request.FILES.get('img_obj2'):
+                processed_content2 = process_image_opencv(request.FILES['img_obj2'])
+                processed_image2 = ProcessedImage()
+                processed_image2.image.save(f'processed2_{get_random_string(8)}.jpg', processed_content2)
+
+            return JsonResponse({
+                'processed_image_url1': processed_image1.image.url if processed_image1 else '',
+                'processed_image_url2': processed_image2.image.url if processed_image2 else ''
+            })
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
 
 def images_upload_view(request):
     img_obj1 = None
@@ -49,19 +78,70 @@ def apply_transformation(request):
     else:
         return render(request, 'home.html')
     
+def process_image_opencv(uploaded_file):
+    img = Image.open(uploaded_file).convert("RGB")
+    open_cv_image = np.array(img)[:, :, ::-1].copy()
+
+    face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
+    gray = cv2.cvtColor(open_cv_image, cv2.COLOR_BGR2GRAY)
+    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+
+    if len(faces) == 0:
+        raise ValueError("Лицо не найдено")
+
+    x, y, w, h = faces[0]
+    h_img, w_img, _ = open_cv_image.shape
+    x1 = max(x - 600, 0)
+    y1 = max(y - 600, 0)
+    x2 = min(x + w + 600, w_img)
+    y2 = min(y + h + 600, h_img)
+
+    cropped = open_cv_image[y1:y2, x1:x2]
+    pil_image = Image.fromarray(cv2.cvtColor(cropped, cv2.COLOR_BGR2RGB))
+
+    width, height = pil_image.size
+    min_side = min(width, height)
+    left_crop = (width - min_side) // 2
+    top_crop = (height - min_side) // 2
+    square_image = pil_image.crop((left_crop, top_crop, left_crop + min_side, top_crop + min_side))
+
+    final_image = square_image.resize((361, 361), Image.LANCZOS)
+    buffer = BytesIO()
+    final_image.save(buffer, format='JPEG')
+    buffer.seek(0)
+    return ContentFile(buffer.read(), name='processed.jpg')
+
 def image_upload(request):
-    img_obj1 = None
+    if request.method == 'POST' and request.FILES.get('img_obj1'):
+        try:
+            processed_content = process_image_opencv(request.FILES['img_obj1'])
 
-    if request.method == 'POST':
-        form1 = ImageForm(request.POST, request.FILES, prefix='form1')
+            processed_image = ProcessedImage()
+            processed_image.image.save('processed_user.jpg', processed_content)
+
+            return JsonResponse({
+                'processed_image_url': processed_image.image.url
+            })
+
+        except Exception as e:
+            return JsonResponse({'error': f'Ошибка обработки изображения: {str(e)}'}, status=500)
+    form = ImageForm()
+    return render(request, 'recogn.html', {'form1': form})
+     #не возвр. стр. т.к. без перезагрузки действуем
+
+# def image_upload(request):
+#     img_obj1 = None
+
+#     if request.method == 'POST':
+#         form1 = ImageForm(request.POST, request.FILES, prefix='form1')
         
-        if form1.is_valid():
-            img_obj1 = form1.save()
+#         if form1.is_valid():
+#             img_obj1 = form1.save()
 
-    else:
-        form1 = ImageForm(prefix='form1')
+#     else:
+#         form1 = ImageForm(prefix='form1')
 
-    return render(request, 'recogn.html', {'form1': form1, 'img_obj1': img_obj1})
+#     return render(request, 'recogn.html', {'form1': form1, 'img_obj1': img_obj1})
 
 
 def detect_emotion(request):

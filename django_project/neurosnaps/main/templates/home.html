@@ -99,26 +99,63 @@
     
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-        $(document).ready(function() {
-            $('input[name=img_obj1]').change(function(e) {
-                var file = e.target.files[0];
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#img_preview1').attr('src', e.target.result);
-                    $('#img_preview1').closest('.image_background').addClass('no-border');
-                };
-                reader.readAsDataURL(file);
-            });
+        // Получение CSRF-токена из cookies
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
 
-            $('input[name=img_obj2]').change(function(e) {
-                var file = e.target.files[0];
-                var reader = new FileReader();
-                reader.onload = function(e) {
-                    $('#img_preview2').attr('src', e.target.result);
-                    $('#img_preview2').closest('.image_background').addClass('no-border');
-                };
-                reader.readAsDataURL(file);
-            });
+        // Установка CSRF-токена для всех AJAX-запросов
+        $.ajaxSetup({
+            beforeSend: function (xhr, settings) {
+                if (!(/^GET|HEAD|OPTIONS|TRACE$/i.test(settings.type))) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        $('input[name=img_obj1], input[name=img_obj2]').change(function(e) {
+            var formData = new FormData();
+            var inputName = $(this).attr('name');
+            var file = this.files[0];
+
+            if (file) {
+                formData.append(inputName, file);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/upload/',  
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        var rand = Math.random();
+
+                        if (response.processed_image_url1) {
+                            $('#img_preview1').attr('src', response.processed_image_url1 + '?' + rand);
+                            $('#img_preview1').closest('.image_background').addClass('no-border');
+                        }
+                        if (response.processed_image_url2) {
+                            $('#img_preview2').attr('src', response.processed_image_url2 + '?' + rand);
+                            $('#img_preview2').closest('.image_background').addClass('no-border');
+                        }
+                    },
+                    error: function(xhr, errmsg, err) {
+                        console.error('Ошибка при отправке:', xhr.responseText);
+                    }
+                });
+            }
         });
         </script>
         <script>
