@@ -1,3 +1,5 @@
+import os
+from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import ProcessedImage
@@ -15,17 +17,32 @@ from io import BytesIO
 from django.utils.crypto import get_random_string
 
 
+def images_upload_view(request):
+    img_obj1 = None
+    img_obj2 = None
+
+    if request.method == 'POST':
+        form1 = ImageForm(request.POST, request.FILES, prefix='form1')
+        form2 = ImageForm(request.POST, request.FILES, prefix='form2')
+        
+        if form1.is_valid() and form2.is_valid():
+            img_obj1 = form1.save()
+            img_obj2 = form2.save()
+    else:
+        form1 = ImageForm(prefix='form1')
+        form2 = ImageForm(prefix='form2')
+
+    return render(request, 'home.html', {'form1': form1, 'form2': form2, 'img_obj1': img_obj1, 'img_obj2': img_obj2})
+
 def images_upload_ajax(request):
     if request.method == 'POST':
         try:
             processed_image1 = None
             processed_image2 = None
-
             if request.FILES.get('img_obj1'):
                 processed_content1 = process_image_opencv(request.FILES['img_obj1'])
                 processed_image1 = ProcessedImage()
                 processed_image1.image.save(f'processed1_{get_random_string(8)}.jpg', processed_content1)
-
             if request.FILES.get('img_obj2'):
                 processed_content2 = process_image_opencv(request.FILES['img_obj2'])
                 processed_image2 = ProcessedImage()
@@ -38,45 +55,65 @@ def images_upload_ajax(request):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-def images_upload_view(request):
-    img_obj1 = None
-    img_obj2 = None
-
-    if request.method == 'POST':
-        form1 = ImageForm(request.POST, request.FILES, prefix='form1')
-        form2 = ImageForm(request.POST, request.FILES, prefix='form2')
-        
-        if form1.is_valid() and form2.is_valid():
-            img_obj1 = form1.save()
-            img_obj2 = form2.save()
-
-    else:
-        form1 = ImageForm(prefix='form1')
-        form2 = ImageForm(prefix='form2')
-
-    return render(request, 'home.html', {'form1': form1, 'form2': form2, 'img_obj1': img_obj1, 'img_obj2': img_obj2})
-
 def apply_transformation(request):
     if request.method == 'POST':
-        img_obj1 = request.FILES['img_obj1'] # получаем 2 изображения для отправки
-        img_obj2 = request.FILES['img_obj2']
-        # serv_url = 'http://localhost:8080/process_images'
-        serv_url = 'http://makeapp-server-anaesthesia.amvera.io/process_images'  # здесь localhost заменить на доменное имя ?сервера с нейросетью?
-        files = {'image1': img_obj1, 'image2': img_obj2}
-        response = requests.post(serv_url, files=files)
+        img_path1 = request.POST.get('img_path1')
+        img_path2 = request.POST.get('img_path2')
+        source = request.POST.get('source')  
 
-        if response.status_code == 200:
-            processed_image = ProcessedImage()
-            processed_image.image.save('processed.jpeg', ContentFile(response.content))
-            image1 = MyImage.objects.create(image=img_obj1)
-            image2 = MyImage.objects.create(image=img_obj2)
-            image_path = processed_image.image.url
+        if not img_path1 or not img_path2:
+            return JsonResponse({'error': 'Пути изображений не переданы.'}, status=400)
+        img_path1 = os.path.join(settings.MEDIA_ROOT, img_path1.replace('/media/', ''))
 
-            return JsonResponse({'image_path': image_path})
+        if source == 'recogn':
+            relative_path = img_path2.replace(settings.STATIC_URL, '')  
+            img_path2 = os.path.join(settings.STATICFILES_DIRS[0], relative_path)
         else:
-            return render(request, 'home.html')
-    else:
-        return render(request, 'home.html')
+            img_path2 = os.path.join(settings.MEDIA_ROOT, img_path2.replace('/media/', ''))
+
+
+        try:
+            with open(img_path1, 'rb') as f1, open(img_path2, 'rb') as f2:
+                files = {
+                    'image1': f1,
+                    'image2': f2,
+                }
+                serv_url = 'http://makeapp-server-anaesthesia.amvera.io/process_images'
+                response = requests.post(serv_url, files=files)
+
+            if response.status_code == 200:
+                processed_image = ProcessedImage()
+                processed_image.image.save('processed.jpeg', ContentFile(response.content))
+                image_path = processed_image.image.url
+                return JsonResponse({'image_path': image_path})
+            else:
+                return JsonResponse({'error': 'Ошибка на сервере обработки.'}, status=500)
+        except FileNotFoundError as e:
+            return JsonResponse({'error': f'Файл не найден: {str(e)}'}, status=500)
+    
+    return render(request, 'home.html')
+
+# def apply_transformation(request):
+#     if request.method == 'POST':
+#         img_obj1 = request.FILES['img_obj1'] # получаем 2 изображения для отправки
+#         img_obj2 = request.FILES['img_obj2']
+#         # serv_url = 'http://localhost:8080/process_images'
+#         serv_url = 'http://makeapp-server-anaesthesia.amvera.io/process_images'  # здесь localhost заменить на доменное имя ?сервера с нейросетью?
+#         files = {'image1': img_obj1, 'image2': img_obj2}
+#         response = requests.post(serv_url, files=files)
+
+#         if response.status_code == 200:
+#             processed_image = ProcessedImage()
+#             processed_image.image.save('processed.jpeg', ContentFile(response.content))
+#             image1 = MyImage.objects.create(image=img_obj1)
+#             image2 = MyImage.objects.create(image=img_obj2)
+#             image_path = processed_image.image.url
+
+#             return JsonResponse({'image_path': image_path})
+#         else:
+#             return render(request, 'home.html')
+#     else:
+#         return render(request, 'home.html')
     
 def process_image_opencv(uploaded_file):
     img = Image.open(uploaded_file).convert("RGB")
@@ -115,19 +152,41 @@ def image_upload(request):
     if request.method == 'POST' and request.FILES.get('img_obj1'):
         try:
             processed_content = process_image_opencv(request.FILES['img_obj1'])
-
             processed_image = ProcessedImage()
             processed_image.image.save('processed_user.jpg', processed_content)
 
             return JsonResponse({
-                'processed_image_url': processed_image.image.url
-            })
-
+                'processed_image_url': processed_image.image.url})
         except Exception as e:
             return JsonResponse({'error': f'Ошибка обработки изображения: {str(e)}'}, status=500)
     form = ImageForm()
     return render(request, 'recogn.html', {'form1': form})
-     #не возвр. стр. т.к. без перезагрузки действуем
+
+def detect_emotion(request):
+    if request.method == 'POST' and request.FILES.get('img_obj1'):
+        url = "http://emotapp-server-anaesthesia.amvera.io"
+        files = {'image': request.FILES['img_obj1']}  
+        try:
+            response = requests.post(url, files=files)
+            # print("Status code:", response.status_code)
+            # print("Response content:", response.content)
+            if response.status_code == 200:
+                try:
+                    data = response.json()
+                except ValueError:
+                    return JsonResponse({'error': 'Ответ сервера не в JSON-формате'}, status=500)
+                user_emotion = data.get('user_emotion', 'Не определено')
+                matching_image = data.get('matching_image', '')
+                return JsonResponse({
+                    'user_emotion': user_emotion,
+                    'matching_image': f"/static/img/{matching_image}" if matching_image else ""})
+            else:
+                return JsonResponse({'error': 'Ошибка обработки на сервере'}, status=500)
+        except requests.exceptions.RequestException as e:
+            return JsonResponse({'error': f'Ошибка соединения: {str(e)}'}, status=500)
+    return JsonResponse({'error': 'Неверный запрос'}, status=400)
+
+
 
 # def image_upload(request):
 #     img_obj1 = None
@@ -142,39 +201,6 @@ def image_upload(request):
 #         form1 = ImageForm(prefix='form1')
 
 #     return render(request, 'recogn.html', {'form1': form1, 'img_obj1': img_obj1})
-
-
-def detect_emotion(request):
-    if request.method == 'POST' and request.FILES.get('img_obj1'):
-        # url = "http://127.0.0.1:8081"  
-        
-        url = "http://emotapp-server-anaesthesia.amvera.io"
-        files = {'image': request.FILES['img_obj1']}  # Отправляем файл
-
-        try:
-            response = requests.post(url, files=files)
-            # print("Status code:", response.status_code)
-            # print("Response content:", response.content)
-            if response.status_code == 200:
-                try:
-                    data = response.json()
-                except ValueError:
-                    return JsonResponse({'error': 'Ответ сервера не в JSON-формате'}, status=500)
-
-                user_emotion = data.get('user_emotion', 'Не определено')
-                matching_image = data.get('matching_image', '')
-
-                return JsonResponse({
-                    'user_emotion': user_emotion,
-                    'matching_image': f"/static/img/{matching_image}" if matching_image else ""
-                })
-            else:
-                return JsonResponse({'error': 'Ошибка обработки на сервере'}, status=500)
-
-        except requests.exceptions.RequestException as e:
-            return JsonResponse({'error': f'Ошибка соединения: {str(e)}'}, status=500)
-    return JsonResponse({'error': 'Неверный запрос'}, status=400)
-
 
 
 # def detect_emotion(request):

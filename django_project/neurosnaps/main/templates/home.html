@@ -15,24 +15,6 @@
         <h1>Disentangled Makeup Transfer</h1>
         <p>Платформа для переноса макияжа по требованию с помощью генеративно-состязательной сети</p>
     </div>
-
-
-
-    <!-- <section class="upload-section">
-        <div class="upload-slot">
-          <span>Фото 1</span>
-        </div>
-        <div class="upload-slot">
-          <span>Фото 2</span>
-        </div>
-        <div class="upload-slot">
-          <span>Фото 3</span>
-        </div>
-    </section> -->
-
-    <!-- <h2>Загрузите фото - мы подберем идеальный макияж по вашему настроению</h2>
-    <a href="{% url 'recognize' %}" class="btn btn-primary mt-4">Загрузить</a> -->
-
     <div class="content">
         <form method="post" enctype="multipart/form-data" action="{% url 'result' %}">
             {% csrf_token %}
@@ -61,7 +43,6 @@
                         <h2>подберем макияж</h2>
                         <h1>по вашему настроению</h1>
                         <a href="{% url 'recognize' %}" class="hero-button">Попробовать</a>
-                        <!-- <button>Попробовать</button> -->
                     </main>
                 </div>
                 <div class="container">
@@ -88,114 +69,117 @@
                             <img src="{{ image_path }}" alt="">
                         </div>
                         <button id="apply_button"type="submit">Применить</button>
-                        <button id="save_button" style="display: none;">Сохранить</button>
+                        <button id="save_button" type="button" style="display: none;">Сохранить</button>
                     </div>
                 </div>
             </div>
         </form>
     </div>
 
-        
-    
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script>
-        // Получение CSRF-токена из cookies
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let cookie of cookies) {
-                    cookie = cookie.trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
+        $(document).ready(function () {
+            let processedImageUrl1 = '';
+            let processedImageUrl2 = '';
+
+            // CSRF
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let cookie of cookies) {
+                        cookie = cookie.trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
                     }
                 }
+                return cookieValue;
             }
-            return cookieValue;
-        }
-        const csrftoken = getCookie('csrftoken');
-
-        // Установка CSRF-токена для всех AJAX-запросов
-        $.ajaxSetup({
-            beforeSend: function (xhr, settings) {
-                if (!(/^GET|HEAD|OPTIONS|TRACE$/i.test(settings.type))) {
-                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                }
-            }
-        });
-
-        $('input[name=img_obj1], input[name=img_obj2]').change(function(e) {
-            var formData = new FormData();
-            var inputName = $(this).attr('name');
-            var file = this.files[0];
-
-            if (file) {
-                formData.append(inputName, file);
-
-                $.ajax({
-                    type: 'POST',
-                    url: '/upload/',  
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    success: function(response) {
-                        var rand = Math.random();
-
-                        if (response.processed_image_url1) {
-                            $('#img_preview1').attr('src', response.processed_image_url1 + '?' + rand);
-                            $('#img_preview1').closest('.image_background').addClass('no-border');
-                        }
-                        if (response.processed_image_url2) {
-                            $('#img_preview2').attr('src', response.processed_image_url2 + '?' + rand);
-                            $('#img_preview2').closest('.image_background').addClass('no-border');
-                        }
-                    },
-                    error: function(xhr, errmsg, err) {
-                        console.error('Ошибка при отправке:', xhr.responseText);
+            const csrftoken = getCookie('csrftoken');
+            $.ajaxSetup({
+                beforeSend: function (xhr, settings) {
+                    if (!(/^GET|HEAD|OPTIONS|TRACE$/i.test(settings.type))) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     }
-                });
-            }
-        });
-        </script>
-        <script>
-            $(document).ready(function() {
-                $('form').submit(function(event) {
-                    event.preventDefault();
-    
-                    var formData = new FormData($(this)[0]);
-    
+                }
+            });
+
+            // Загрузка обрезанных изображений
+            $('input[name=img_obj1], input[name=img_obj2]').change(function (e) {
+                const formData = new FormData();
+                const inputName = $(this).attr('name');
+                const file = this.files[0];
+
+                if (file) {
+                    formData.append(inputName, file);
                     $.ajax({
                         type: 'POST',
-                        url: $(this).attr('action'),
+                        url: '/upload/',
                         data: formData,
                         processData: false,
                         contentType: false,
-                        success: function(response) {
-                            var randomString = Math.random().toString(36).substring(7);
-                            $('#result_image img').attr('src', response.image_path + '?' + randomString);
-                            $('#result_image img').closest('.image_background').addClass('no-border');
-                            $('#save_button').show();
+                        success: function (response) {
+                            const rand = Math.random();
+                            if (response.processed_image_url1) {
+                                processedImageUrl1 = response.processed_image_url1;
+                                $('#img_preview1').attr('src', processedImageUrl1 + '?' + rand);
+                                $('#img_preview1').closest('.image_background').addClass('no-border');
+                            }
+                            if (response.processed_image_url2) {
+                                processedImageUrl2 = response.processed_image_url2;
+                                $('#img_preview2').attr('src', processedImageUrl2 + '?' + rand);
+                                $('#img_preview2').closest('.image_background').addClass('no-border');
+                            }
                         },
-                        error: function(xhr, errmsg, err) {
-                            console.log(xhr.status + ': ' + xhr.responseText);
+                        error: function (xhr) {
+                            console.error('Ошибка при отправке:', xhr.responseText);
                         }
                     });
+                }
+            });
+
+            // Отправка формы apply_transformation
+            $('form').submit(function (event) {
+                event.preventDefault();
+
+                if (!processedImageUrl1 || !processedImageUrl2) {
+                    alert('Сначала загрузите оба изображения');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('img_path1', processedImageUrl1);
+                formData.append('img_path2', processedImageUrl2);
+
+                $.ajax({
+                    type: 'POST',
+                    url: $(this).attr('action'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        const rand = Math.random().toString(36).substring(7);
+                        $('#result_image img').attr('src', response.image_path + '?' + rand);
+                        $('#result_image img').closest('.image_background').addClass('no-border');
+                        $('#save_button').show();
+                    },
+                    error: function (xhr, errmsg, err) {
+                        console.log(xhr.status + ': ' + xhr.responseText);
+                    }
                 });
             });
-        </script>
-        <script>
-            $('#save_button').click(function() {
-                var resultImageUrl = $('#result_image img').attr('src');
-
-                var randomString = Math.random().toString(36).substring(7);
-
-                var downloadLink = document.createElement('a');
+            $('#save_button').click(function () {
+                const resultImageUrl = $('#result_image img').attr('src');
+                const randomString = Math.random().toString(36).substring(7);
+                const downloadLink = document.createElement('a');
                 downloadLink.href = resultImageUrl + '?' + randomString;
-                downloadLink.download = 'processed_image.jpeg';  
-
+                downloadLink.download = 'processed_image.jpeg';
                 downloadLink.click();
             });
+        });
+
         </script>
 
     </div>

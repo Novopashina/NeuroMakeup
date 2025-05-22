@@ -62,7 +62,7 @@
                         <img src="{{ image_path }}">
                     </div>
                     <button id="apply_makeup"type="button">Применить</button>
-                    <button id="save_button" style="display: none;">Сохранить</button>
+                    <button id="save_button" type="button" style="display: none;">Сохранить</button>
                 </div>
             </div>
         </form>
@@ -71,37 +71,36 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
     $(document).ready(function () {
+        let processedImageUrl1 = '';
+        let processedImageUrl2 = '';
+
         $('input[name=img_obj1]').change(function (e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            let formData = new FormData();
+            const formData = new FormData();
             formData.append('img_obj1', file);
 
             $.ajax({
-                url: '{% url "recognize" %}',  // image_upload view
+                url: '{% url "recognize" %}',
                 type: 'POST',
                 data: formData,
                 processData: false,
                 contentType: false,
                 success: function (data) {
                     if (data.processed_image_url) {
-                        $('#img_preview1').attr('src', data.processed_image_url + '?' + Math.random());
+                        processedImageUrl1 = data.processed_image_url;
+                        $('#img_preview1').attr('src', processedImageUrl1 + '?' + Math.random());
                         $('#img_preview1').show();
                         $('#img_preview1').closest('.image_background').addClass('no-border');
-
                     }
                 },
-                error: function (xhr, errmsg, err) {
+                error: function (xhr) {
                     console.error("Ошибка загрузки: ", xhr.responseText);
                     alert("Ошибка обработки изображения");
                 }
             });
         });
-    });
-    </script>
-    <script>
-    $(document).ready(function() {
         $('#emotion_form').submit(function(event) {
             event.preventDefault();
         
@@ -128,59 +127,52 @@
                 }
             });
         });
+        $('#apply_makeup').click(function (event) {
+        event.preventDefault();
+
+        const fullUrl = $('#img_preview2').attr('src');
+        const relativePath = fullUrl.split('/static/')[1]; // Берём только часть после "/static/"
+        processedImageUrl2 = '/static/' + relativePath;
+
+        if (!processedImageUrl1 || !processedImageUrl2) {
+            alert("Сначала загрузите оба изображения!");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('img_path1', processedImageUrl1);
+        formData.append('img_path2', processedImageUrl2);
+        formData.append('source', 'recogn');  // Добавляем признак источника
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "result" %}',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                const rand = Math.random().toString(36).substring(7);
+                $('#result_image img').attr('src', response.image_path + '?' + rand);
+                $('#result_image img').closest('.image_background').addClass('no-border');
+                $('#save_button').show();
+            },
+            error: function (xhr, errmsg, err) {
+                console.log("Ошибка: " + xhr.status + ": " + xhr.responseText);
+            }
+        });
     });
-    </script>
-    <script>
-        $(document).ready(function () {
-            $('#apply_makeup').click(function (event) {
-                event.preventDefault(); // не отправляем всю форму
-    
-                const img1File = $('input[name=img_obj1]')[0].files[0];
-                const img2Src = $('#img_preview2').attr('src');
-    
-                if (!img1File || !img2Src) {
-                    alert("Загрузите оба изображения!");
-                    return;
-                }
-    
-                fetch(img2Src)
-                    .then(res => res.blob())
-                    .then(function (blob) {
-                        let formData = new FormData();
-                        formData.append('img_obj1', img1File);
-                        formData.append('img_obj2', blob, 'matching.jpg');
-    
-                        $.ajax({
-                            type: 'POST',
-                            url: '{% url "result" %}',  // путь к apply_transformation
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            success: function (response) {
-                                const randomString = Math.random().toString(36).substring(7);
-                                $('#result_image img').attr('src', response.image_path + '?' + randomString);
-                                $('#result_image img').closest('.image_background').addClass('no-border');
-                                $('#save_button').show();
-                            },
-                            error: function (xhr, errmsg, err) {
-                                console.log("Ошибка: " + xhr.status + ": " + xhr.responseText);
-                            }
-                        });
-                    });
-            });
-        });
-    </script>
-    <script>
-        // Кнопка "Сохранить"
-        $('#save_button').click(function () {
-            const resultImageUrl = $('#result_image img').attr('src');
-            const randomString = Math.random().toString(36).substring(7);
-            const downloadLink = document.createElement('a');
-            downloadLink.href = resultImageUrl + '?' + randomString;
-            downloadLink.download = 'processed_image.jpeg';
-            downloadLink.click();
-        });
-    </script>
+
+
+    $('#save_button').click(function () {
+        const resultImageUrl = $('#result_image img').attr('src');
+        const randomString = Math.random().toString(36).substring(7);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = resultImageUrl + '?' + randomString;
+        downloadLink.download = 'processed_image.jpeg';
+        downloadLink.click();
+    });
+});
+</script>
     <script>
         function getCookie(name) {
             let cookieValue = null;
@@ -199,8 +191,6 @@
         }
     
         const csrftoken = getCookie('csrftoken');
-    
-        // Устанавливаем заголовок CSRF для всех ajax-запросов
         $.ajaxSetup({
             beforeSend: function (xhr, settings) {
                 if (!(/^GET|HEAD|OPTIONS|TRACE$/.test(settings.type)) && !this.crossDomain) {
